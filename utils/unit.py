@@ -1,5 +1,5 @@
 
-class Units:
+class Unit:
 
     """
         All of the units in the physics world:
