@@ -64,7 +64,7 @@ class Formula:
 
             for key, value in variable_bounds.items():
                 assert isinstance(key, str), "Key is not a string"
-                assert isinstance(value, list), "Value is not a list"
+                # assert isinstance(value, list), "Value is not a list"
 
             self.variable_bounds = variable_bounds
 
@@ -92,6 +92,7 @@ class Formula:
         else:
             assert isinstance(units, dict), "units is not a dict"
             assert len(units) == len(variables)
+            assert set(units.keys()) == set(variables), "inconsistent units and variables."
             for key, value in units.items():
                 assert isinstance(key, str), "Key is not a string"
                 assert isinstance(value, Unit), "Value is not a list"
