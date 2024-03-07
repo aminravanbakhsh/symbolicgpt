@@ -40,8 +40,6 @@ class Unit:
 
     def __init__(self, length=0, mass=0, time=0, electric_current=0, temperature=0, luminous=0, mole=0, params=None):
 
-        assert type(params) == dict, ValueError("params is not a dictionary.")
-
         self.length = length
         self.mass = mass
         self.time = time
@@ -50,18 +48,21 @@ class Unit:
         self.luminous = luminous
         self.mole = mole
 
-        for key in params:
-            if key in Units.VALID_UNITS:
-                self.length += Units.VALID_UNITS[key][0]
-                self.mass += Units.VALID_UNITS[key][1]
-                self.time += Units.VALID_UNITS[key][2]
-                self.electric_current += Units.VALID_UNITS[key][3]
-                self.temperature += Units.VALID_UNITS[key][4]
-                self.luminous += Units.VALID_UNITS[key][5]
-                self.mole += Units.VALID_UNITS[key][6]
-            
-            else:
-                raise ValueError(f"{key} is not a valid unit")
+        if params:
+            assert type(params) == dict, ValueError("params is not a dictionary.")
+            for key in params:
+                if key in Unit.VALID_UNITS:
+                    
+                    self.length += Unit.VALID_UNITS[key][0] * params[key]
+                    self.mass += Unit.VALID_UNITS[key][1] * params[key]
+                    self.time += Unit.VALID_UNITS[key][2] * params[key]
+                    self.electric_current += Unit.VALID_UNITS[key][3] * params[key]
+                    self.temperature += Unit.VALID_UNITS[key][4] * params[key]
+                    self.luminous += Unit.VALID_UNITS[key][5] * params[key]
+                    self.mole += Unit.VALID_UNITS[key][6] * params[key]
+                
+                else:
+                    raise ValueError(f"{key} is not a valid unit")
 
 
     def __str__(self):

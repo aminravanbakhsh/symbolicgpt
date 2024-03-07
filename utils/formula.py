@@ -1,4 +1,9 @@
+import sys
+import os
+import pdb
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_dir)
 
 import numpy as np
 from unit import Unit
@@ -54,6 +59,9 @@ class Formula:
 
         else:
             assert isinstance(variable_bounds, dict), "Variable is not a dictionary"
+            assert len(variable_bounds) == len(variables), "inconsistent variable_bounds and variables"
+
+
             for key, value in variable_bounds.items():
                 assert isinstance(key, str), "Key is not a string"
                 assert isinstance(value, list), "Value is not a list"
@@ -66,6 +74,8 @@ class Formula:
                 self.constant_bounds[c] = [ -Formula.DEFAULT_CONSTANT_BOUND_LIST[2], Formula.DEFAULT_CONSTANT_BOUND_LIST[2]]
         else:
             assert isinstance(constant_bounds, dict), "Variable is not a dictionary"
+            assert len(constant_bounds) == len(constants), "inconsistent constant_bounds and constants"
+
             for key, value in constant_bounds.items():
                 assert isinstance(key, str), "Key is not a string"
                 assert isinstance(value, list), "Value is not a list"
@@ -80,9 +90,10 @@ class Formula:
 
             self.units = units_dict
         else:
-            assert isinstance(units, dict)
-
+            assert isinstance(units, dict), "units is not a dict"
+            assert len(units) == len(variables)
             for key, value in units.items():
-                assert isinstance(key, Unit), "key is not a Unit"
-                
-            self.constant_bounds = constant_bounds
+                assert isinstance(key, str), "Key is not a string"
+                assert isinstance(value, Unit), "Value is not a list"
+
+            self.units = units
