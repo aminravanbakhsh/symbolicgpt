@@ -11,6 +11,7 @@
 **/.ipynb_checkpoints/*
 **/models/*
 **/venv/*
+**/.venv/*
 **/plots/*
 benchmarkSimilarEquations.json
 **/benchmark/*

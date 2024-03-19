@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: DimensionAnalysis
+Version: 0.1
+Summary: Utilizing Dimensional Analysis technique, which is commonly used in Physics , alongside SymbolicGPT to detect equations describing the AI-Feynman Datasets.
+Home-page: https://aminravanbakhsh.com/
+Author: Amin Ravanbakhsh
+Author-email: amin.ravanbakhsh@uwaterloo.ca
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.6
+License-File: LICENSE.txt
+
+UNKNOWN
+
