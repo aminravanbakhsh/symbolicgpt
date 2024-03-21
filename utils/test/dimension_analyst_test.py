@@ -6,7 +6,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 
-from dimension_analysis import Dimensional_Analysis
+from dimension_analyst import Dimensional_Analyst
 from formula import Formula
 from unit import Unit
 
@@ -53,7 +53,7 @@ def test_001():
                 constant_bounds = data["constants_dict"],
                 units           = data['units'])
                 
-    Dimensional_Analysis.func(f)
+    Dimensional_Analyst.func(f)
 
 
 
@@ -93,4 +93,4 @@ def test_002():
                 constant_bounds = {},
                 units           = data['units'])
                 
-    Dimensional_Analysis.func(f)
+    Dimensional_Analyst.func(f)
