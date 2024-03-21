@@ -9,7 +9,7 @@ from unit import Unit
 from formula import Formula
 
 
-class Dimensional_Analysis:
+class Dimensional_Analyst:
 
     @classmethod
     def func(cls, formula: Formula):
