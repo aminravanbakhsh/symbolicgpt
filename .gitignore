@@ -10,6 +10,7 @@
 **/.vscode/*
 **/.ipynb_checkpoints/*
 **/models/*
+**/untracked_folder/*
 **/venv/*
 **/.venv/*
 **/plots/*
