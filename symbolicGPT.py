@@ -154,6 +154,7 @@ pconf = PointNetConfig(embeddingSize=embeddingSize,
 mconf = GPTConfig(train_dataset.vocab_size, train_dataset.block_size,
                   n_layer=8, n_head=8, n_embd=embeddingSize, 
                   padding_idx=train_dataset.paddingID)
+
 model = GPT(mconf, pconf)
     
 # initialize a trainer instance and kick off training
