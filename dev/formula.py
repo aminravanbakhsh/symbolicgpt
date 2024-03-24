@@ -12,6 +12,7 @@ class Formula:
 
     DEFAULT_VARIABLE_BOUND_LIST = [1, 5, 10, 100, 1000]
     DEFAULT_CONSTANT_BOUND_LIST = [1, 5, 10, 100, 1000]
+    DEFAULT_NUMBER = 0
 
     def __init__(self, 
                     equation: str, 
@@ -19,7 +20,7 @@ class Formula:
                     constants = [], 
                     variable_bounds = None, 
                     constant_bounds = None, 
-                    units = None
+                    units = None,
                     ):
         """
         inputs:
@@ -55,7 +56,7 @@ class Formula:
         if variable_bounds == None:
             self.variable_bounds = {}
             for var in self.variables:
-                self.variable_bounds[var] = [ -Formula.DEFAULT_VARIABLE_BOUND_LIST[2], Formula.DEFAULT_VARIABLE_BOUND_LIST[2]]
+                self.variable_bounds[var] = [ -Formula.DEFAULT_VARIABLE_BOUND_LIST[Formula.DEFAULT_NUMBER], Formula.DEFAULT_VARIABLE_BOUND_LIST[Formula.DEFAULT_NUMBER]]
 
         else:
             assert isinstance(variable_bounds, dict), "Variable is not a dictionary"
@@ -71,7 +72,7 @@ class Formula:
         if constant_bounds == None:
             self.constant_bounds = {}
             for c in self.constants:
-                self.constant_bounds[c] = [ -Formula.DEFAULT_CONSTANT_BOUND_LIST[2], Formula.DEFAULT_CONSTANT_BOUND_LIST[2]]
+                self.constant_bounds[c] = [ -Formula.DEFAULT_CONSTANT_BOUND_LIST[Formula.DEFAULT_NUMBER], Formula.DEFAULT_CONSTANT_BOUND_LIST[Formula.DEFAULT_NUMBER]]
         else:
             assert isinstance(constant_bounds, dict), "Variable is not a dictionary"
             assert len(constant_bounds) == len(constants), "inconsistent constant_bounds and constants"

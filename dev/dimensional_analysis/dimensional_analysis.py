@@ -252,11 +252,8 @@ def test_002():
         templatesEQs = None
 
 
-
-
-
-
 ###################################################################################################################################
+
 
         device='gpu'
         scratch=True # if you want to ignore the cache and start for scratch

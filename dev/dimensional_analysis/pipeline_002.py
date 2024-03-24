@@ -1,14 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# set up logging
-import logging
-logging.basicConfig(
-        format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-        datefmt="%m/%d/%Y %H:%M:%S",
-        level=logging.INFO,
-)
-
 
 import os
 import sys
@@ -58,7 +47,7 @@ import pdb
 set_seed(42)
 
 # config
-device='gpu'
+device='cpu'
 scratch=True # if you want to ignore the cache and start for scratch
 
 #####################################################################################################################
@@ -96,6 +85,7 @@ dataFolder = '1-9Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_20-250'
 #                                                config                                                             #
 #####################################################################################################################
 
+numVars=9
 
 dataDir = "/home/amin/vscodes/symbolicgpt/untracked_folder/datasets"
 dataFolder = "sample_dataset"
@@ -145,13 +135,6 @@ fName = '{}_SymbolicGPT_{}_{}_{}_MINIMIZE.txt'.format(dataInfo,
                                              variableEmbedding)
 
 ckptPath = '{}/{}.pt'.format(addr,fName.split('.txt')[0])
-
-
-
-MODEL_PATH = "/home/amin/vscodes/symbolicgpt/untracked_folder/models/XYE_9Var_20-250Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-z = torch.load(MODEL_PATH)
-
-pdb.set_trace()
 
 try:
     os.mkdir(addr)
