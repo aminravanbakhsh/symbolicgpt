@@ -45,13 +45,13 @@ def test_001():
         }
     }
 
-
     f = Formula(equation        = data['equation'].replace('^', '**'), 
                 variables       = list(data["variables_dict"].keys()),
                 constants       = list(data["constants_dict"].keys()),
                 variable_bounds =  data["variables_dict"],
                 constant_bounds = data["constants_dict"],
-                units           = data['units'])
+                units           = data['units'],
+                )
                 
     print(f.equation)
     print(f.units)
