@@ -1,0 +1,4 @@
+Test Case 0/380.
+C*cos(C*x2)+C
+SymbolicGPT:
+C*cpt(C*{2+C)+C
