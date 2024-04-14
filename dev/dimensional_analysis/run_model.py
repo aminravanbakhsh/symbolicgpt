@@ -27,6 +27,7 @@ from scipy.optimize import minimize, least_squares
 from models import GPT, GPTConfig, PointNetConfig
 
 
+
 def test_001():
     
     TEST_INDEX = 1  
@@ -47,12 +48,14 @@ def test_001():
     # train dataset
 
     # create the model
-    pconf = PointNetConfig(embeddingSize=embeddingSize, 
-                    numberofPoints=numPoints[1]-1, 
-                    numberofVars=numVars, 
-                    numberofYs=numYs,
-                    method=method,
-                    variableEmbedding=variableEmbedding)
+    pconf = PointNetConfig(
+                    embeddingSize       = embeddingSize, 
+                    numberofPoints      = numPoints[1] - 1, 
+                    numberofVars        = numVars, 
+                    numberofYs          = numYs,
+                    method              = method,
+                    variableEmbedding   =variableEmbedding,
+                    )
     
     # config
     mconf = GPTConfig(
@@ -64,6 +67,8 @@ def test_001():
         padding_idx=train_dataset.paddingID)
 
     model = GPT(mconf, pconf)
+
+
 
 
 def test_002():
@@ -103,14 +108,10 @@ def test_002():
     files = glob.glob(path)[:maxNumFiles]
     text = processDataFiles(files)
 
-
-
     chars = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data
     text = text.split('\n') # convert the raw text to a set of examples
     trainText = text[:-1] if len(text[-1]) == 0 else text
     random.shuffle(trainText) # shuffle the dataset, it's important specailly for the combined number of variables experiment
-
-
 
     train_dataset = CharDataset(
                                 data=           text, 
@@ -131,12 +132,13 @@ def test_002():
     
 
     # create the model
-    pconf = PointNetConfig(embeddingSize=embeddingSize, 
-                    numberofPoints=numPoints[1]-1, 
-                    numberofVars=numVars, 
-                    numberofYs=numYs,
-                    method=method,
-                    variableEmbedding=variableEmbedding)
+    pconf = PointNetConfig(
+                    embeddingSize       =embeddingSize, 
+                    numberofPoints      =numPoints[1]-1, 
+                    numberofVars        =numVars, 
+                    numberofYs          =numYs,
+                    method              =method,
+                    variableEmbedding   =variableEmbedding)
     
     # config
     mconf = GPTConfig(
