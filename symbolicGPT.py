@@ -88,9 +88,6 @@ variableEmbedding = 'NOT_VAR' # NOT_VAR/LEA_EMB/STR_VAR
 
 
 
-
-
-
 # NOT_VAR: Do nothing, will not pass any information from the number of variables in the equation to the GPT
 # LEA_EMB: Learnable embedding for the variables, added to the pointNET embedding
 # STR_VAR: Add the number of variables to the first token
@@ -194,6 +191,7 @@ tconf = TrainerConfig(max_epochs=numEpochs, batch_size=batchSize,
                       lr_decay=True, warmup_tokens=512*20, 
                       final_tokens=2*len(train_dataset)*blockSize,
                       num_workers=0, ckpt_path=ckptPath)
+
 trainer = Trainer(model, train_dataset, val_dataset, tconf, bestLoss, device=device)
 
 # # load the best model before training

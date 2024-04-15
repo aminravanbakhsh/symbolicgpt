@@ -47,6 +47,48 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
+    def instantiate_model(cls, num_vars=1) -> GPT:
+        args = None
+        if num_vars == 1:
+            args = cls.ARGS_1
+
+        numVars             = args["numVars"]
+        numYs               = args["numYs"]
+        numPoints           = args["numPoints"] 
+        embeddingSize       = args["embeddingSize"]
+        method              = args["method"]
+        variableEmbedding   = args["variableEmbedding"]
+        block_size          = args["blockSize"]
+        vocab_size          = args["vocab_size"]
+        paddingID           = args["paddingID"]
+
+        pdb.set_trace()
+
+        # create the model
+        pconf = PointNetConfig(
+                                embeddingSize        = embeddingSize, 
+                                numberofPoints       = numPoints[1]-1, 
+                                numberofVars         = numVars, 
+                                numberofYs           = numYs,
+                                method               = method,
+                                variableEmbedding    = variableEmbedding)
+
+        mconf = GPTConfig(
+                            vocab_size, 
+                            block_size,
+                            n_layer         = 8, 
+                            n_head          = 8,   
+                            n_embd          = embeddingSize, 
+                            padding_idx     = paddingID
+                        )
+
+        model = GPT(mconf, pconf)
+
+        pdb.set_trace()
+
+        return model
+
+    @classmethod
     def train_model(cls, num_vars=5):
         pass
 
@@ -62,50 +104,8 @@ class Pipeline:
             XYE_9Var_20-250Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
         """
 
-
         params = {}
         model = None
-
-        if      num_vars == 1:
-            dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
-            model_path  = "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
-            numEpochs           = 20 # number of epochs to train the GPT+PT model
-            embeddingSize       = 512 # the hidden dimension of the representation of both GPT and PT
-            numPoints           = [30,31] # number of points that we are going to receive to make a prediction about f given x and y, if you don't know then use the maximum
-            numVars             = 1 # the dimenstion of input points x, if you don't know then use the maximum
-            numYs               = 1 # the dimension of output points y = f(x), if you don't know then use the maximum
-            blockSize           = 200 # spatial extent of the model for its context
-            testBlockSize       = 400
-            batchSize           = 128 # batch size of training data
-            target              = 'Skeleton' #'Skeleton' #'EQ'
-            const_range         = [-2.1, 2.1] # constant range to generate during training only if target is Skeleton
-            decimals            = 8 # decimals of the points only if target is Skeleton
-            trainRange          = [-3.0,3.0] # support range to generate during training only if target is Skeleton
-            dataDir             = './datasets/'
-            dataInfo            = 'XYE_{}Var_{}Points_{}EmbeddingSize'.format(numVars, numPoints, embeddingSize)
-            titleTemplate       = "{} equations of {} variables - Benchmark"
-            target              = 'Skeleton' #'Skeleton' #'EQ'
-            dataFolder          = '1Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_30Points'
-            addr                = './SavedModels/' # where to save model
-            method              = 'EMB_SUM' # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation. 
-            variableEmbedding   = 'NOT_VAR' # NOT_VAR/LEA_EMB/STR_VAR
-
-        elif    num_vars == 2:
-            dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
-            model_path  = "XYE_2Var_200-201Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
-        elif    num_vars == 3:
-            dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
-            model_path  = "XYE_3Var_500-501Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
-        elif    num_vars == 5:
-            dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
-            model_path  = "XYE_5Var_10-200Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
-        elif    num_vars == 9:
-            dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
-            model_path  = "XYE_9Var_20-250Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
 
         return model, params
 
@@ -160,7 +160,8 @@ class Pipeline:
                                     const_range = const_range, 
                                     xRange      = trainRange, 
                                     decimals    = decimals, 
-                                    augment     = False)
+                                    augment     = False
+                                    )
 
         pdb.set_trace()
 
