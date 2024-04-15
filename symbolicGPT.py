@@ -175,12 +175,13 @@ outputs = ''.join([train_dataset.itos[int(i)] for i in outputs])
 print('id:{}\ninputs:{}\noutputs:{}\npoints:{}\nvariables:{}'.format(idx,inputs,outputs,points, variables))
 
 # create the model
-pconf = PointNetConfig(embeddingSize=embeddingSize, 
-                       numberofPoints=numPoints[1]-1, 
-                       numberofVars=numVars, 
-                       numberofYs=numYs,
-                       method=method,
-                       variableEmbedding=variableEmbedding)
+pconf = PointNetConfig(embeddingSize        = embeddingSize, 
+                       numberofPoints       = numPoints[1]-1, 
+                       numberofVars         = numVars, 
+                       numberofYs           = numYs,
+                       method               = method,
+                       variableEmbedding    = variableEmbedding)
+
 mconf = GPTConfig(train_dataset.vocab_size, train_dataset.block_size,
                   n_layer=8, n_head=8, n_embd=embeddingSize, 
                   padding_idx=train_dataset.paddingID)

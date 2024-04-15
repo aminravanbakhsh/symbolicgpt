@@ -40,10 +40,6 @@ class Pipeline:
         pass
 
 
-
-
-
-
     ################################################################################################
     #                              #            Model              #                               #
     ################################################################################################
@@ -53,8 +49,6 @@ class Pipeline:
     @classmethod
     def train_model(cls, num_vars=5):
         pass
-
-        
 
 
     @classmethod
@@ -75,7 +69,6 @@ class Pipeline:
         if      num_vars == 1:
             dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
             model_path  = "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
 
             numEpochs           = 20 # number of epochs to train the GPT+PT model
             embeddingSize       = 512 # the hidden dimension of the representation of both GPT and PT
@@ -98,34 +91,23 @@ class Pipeline:
             method              = 'EMB_SUM' # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation. 
             variableEmbedding   = 'NOT_VAR' # NOT_VAR/LEA_EMB/STR_VAR
 
-
-
-
-
-
         elif    num_vars == 2:
             dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
             model_path  = "XYE_2Var_200-201Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
 
         elif    num_vars == 3:
             dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
             model_path  = "XYE_3Var_500-501Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
 
-
         elif    num_vars == 5:
             dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
             model_path  = "XYE_5Var_10-200Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
-
-
 
         elif    num_vars == 9:
             dir_path    = "/home/amin/vscodes/symbolicgpt/untracked_folder/models"
             model_path  = "XYE_9Var_20-250Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt"
 
-
         return model, params
-
 
     ################################################################################################
     #                              #            Data               #                               #
@@ -139,14 +121,51 @@ class Pipeline:
         return data    
 
     @classmethod
-    def load_train_data(cls):
-        data_dir = cls.ARGS_1['data_dir']
-        dataFolder = "sample_dataset"
+    def load_train_data(cls, args_index = 1):
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
+        data_dir        = args["data_dir"]
+        blockSize       = args["blockSize"]
+        numVars         = args["numVars"]
+        numYs           = args["numYs"]
+        numPoints       = args["numPoints"] 
+        target          = args["target"]
+        addVars         = True if args["variableEmbedding"] == 'STR_VAR' else False
+        const_range     = args["const_range"]
+        trainRange      = args["trainRange"]
+        decimals        = args["decimals"]
+
         maxNumFiles = 10
 
         path = "{}/Train/*.json".format(data_dir)
         files = glob.glob(path)[:maxNumFiles]
         text = processDataFiles(files)
+        chars = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data
+        text = text.split('\n') # convert the raw text to a set of examples
+        trainText = text[:-1] if len(text[-1]) == 0 else text
+        
+        random.shuffle(trainText) # shuffle the dataset, it's important specailly for the combined number of variables experiment
+        
+        train_dataset = CharDataset(text, 
+                                    blockSize, 
+                                    chars, 
+                                    numVars     = numVars, 
+                                    numYs       = numYs,
+                                    numPoints   = numPoints,
+                                    target      = target,
+                                    addVars     = addVars,
+                                    const_range = const_range, 
+                                    xRange      = trainRange, 
+                                    decimals    = decimals, 
+                                    augment     = False)
+
+        pdb.set_trace()
+
+        return train_dataset
+                
 
     @classmethod
     def sample_from_data(cls, 
@@ -200,4 +219,57 @@ class Pipeline:
             "addr"                : './SavedModels/', # where to save model
             "method"              : 'EMB_SUM', # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation. 
             "variableEmbedding"   : 'NOT_VAR', # NOT_VAR/LEA_EMB/STR_VAR
+            "vocab_size"          : 49,
+            "paddingID"           : 34,
+            "size"                : 498795,
+            "itos"                : {   
+                                        0: '\n',
+                                        1: ' ', 
+                                        2: '"', 
+                                        3: '(', 
+                                        4: ')', 
+                                        5: '*', 
+                                        6: '+',
+                                        7: ',', 
+                                        8: '-',
+                                        9: '.', 
+                                        10: '/', 
+                                        11: '0',
+                                        12: '1',
+                                        13: '2',
+                                        14: '3', 
+                                        15: '4', 
+                                        16: '5', 
+                                        17: '6', 
+                                        18: '7', 
+                                        19: '8', 
+                                        20: '9', 
+                                        21: ':', 
+                                        22: ':', 
+                                        23: '<', 
+                                        24: '>', 
+                                        25: 'C', 
+                                        26: 'E', 
+                                        27: 'Q', 
+                                        28: 'S', 
+                                        29: 'T', 
+                                        30: 'X', 
+                                        31: 'Y', 
+                                        32: '[', 
+                                        33: ']', 
+                                        34: '_', 
+                                        35: 'c', 
+                                        36: 'e', 
+                                        37: 'g', 
+                                        38: 'i', 
+                                        39: 'k', 
+                                        40: 'l', 
+                                        41: 'n', 
+                                        42: 'o', 
+                                        43: 'p', 
+                                        44: 's', 
+                                        45: 't', 
+                                        46: 'x', 
+                                        47: '{', 
+                                        48: '}'}
     }
