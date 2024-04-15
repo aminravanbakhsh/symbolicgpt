@@ -51,6 +51,13 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
+    def train_model(cls, num_vars=5):
+        pass
+
+        
+
+
+    @classmethod
     def load_model(cls, num_vars = 5):
 
         """
@@ -132,6 +139,16 @@ class Pipeline:
         return data    
 
     @classmethod
+    def load_train_data(cls):
+        data_dir = cls.ARGS_1['data_dir']
+        dataFolder = "sample_dataset"
+        maxNumFiles = 10
+
+        path = "{}/Train/*.json".format(data_dir)
+        files = glob.glob(path)[:maxNumFiles]
+        text = processDataFiles(files)
+
+    @classmethod
     def sample_from_data(cls, 
                          data, 
                          num = -1, 
@@ -151,3 +168,36 @@ class Pipeline:
         transformed_equation = None
         return equation
     
+
+    
+    ################################################################################################
+    #                              #          Parameters           #                               #
+    ################################################################################################
+    #                              ####    ####    ####    ####    #                               # 
+    ################################################################################################
+
+    ARGS_1 = {
+            "data_dir"            : "/home/amin/vscodes/symbolicgpt/untracked_folder/datasets/1Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_30Points",
+            "model_dir_path"      : "/home/amin/vscodes/symbolicgpt/untracked_folder/models",
+            "model_path"          : "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
+            "numEpochs"           : 20, # number of epochs to train the GPT+PT model
+            "embeddingSize"       : 512, # the hidden dimension of the representation of both GPT and PT
+            "numPoints"           : [30,31], # number of points that we are going to receive to make a prediction about f given x and y, if you don't know then use the maximum
+            "numVars"             : 1, # the dimenstion of input points x, if you don't know then use the maximum
+            "numYs"               : 1, # the dimension of output points y = f(x), if you don't know then use the maximum
+            "blockSize"           : 200, # spatial extent of the model for its context
+            "testBlockSize"       : 400,
+            "batchSize"           : 128, # batch size of training data
+            "target"              : 'Skeleton', #'Skeleton' #'EQ'
+            "const_range"         : [-2.1, 2.1], # constant range to generate during training only if target is Skeleton
+            "decimals"            : 8, # decimals of the points only if target is Skeleton
+            "trainRange"          : [-3.0,3.0], # support range to generate during training only if target is Skeleton
+            "dataDir"             : './datasets/',
+            # "dataInfo"            : 'XYE_{}Var_{}Points_{}EmbeddingSize'.format(numVars, numPoints, embeddingSize),
+            "titleTemplate"       : "{} equations of {} variables - Benchmark",
+            "target"              : 'Skeleton', #'Skeleton' #'EQ'
+            "dataFolder"          : '1Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_30Points',
+            "addr"                : './SavedModels/', # where to save model
+            "method"              : 'EMB_SUM', # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation. 
+            "variableEmbedding"   : 'NOT_VAR', # NOT_VAR/LEA_EMB/STR_VAR
+    }

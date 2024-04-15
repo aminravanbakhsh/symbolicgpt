@@ -57,16 +57,16 @@ def test_001():
                     variableEmbedding   =variableEmbedding,
                     )
     
-    # config
-    mconf = GPTConfig(
-        vocab_size, 
-        blockSize, 
-        n_layer=8,
-        n_head=8,
-        n_embd=embeddingSize, 
-        padding_idx=train_dataset.paddingID)
+    # # config
+    # mconf = GPTConfig(
+    #     vocab_size, 
+    #     blockSize, 
+    #     n_layer=8,
+    #     n_head=8,
+    #     n_embd=embeddingSize, 
+    #     padding_idx=train_dataset.paddingID)
 
-    model = GPT(mconf, pconf)
+    # model = GPT(mconf, pconf)
 
 
 
@@ -82,9 +82,7 @@ def test_002():
     method = 'EMB_SUM'
     variableEmbedding = 'NOT_VAR'
     addVars = True if variableEmbedding == 'STR_VAR' else False
-
     addVars = False
-
 
     batchSize = 128 # batch size of training data
     target = 'Skeleton' #'Skeleton' #'EQ'
