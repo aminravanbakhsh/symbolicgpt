@@ -24,6 +24,7 @@ from helpers import set_seed, sample_from_model
 from helpers import processDataFiles, CharDataset, relativeErr, mse, sqrt, divide, lossFunc
 
 from scipy.optimize import minimize, least_squares
+from trainer import Trainer, TrainerConfig
 from models import GPT, GPTConfig, PointNetConfig
 
 
@@ -47,9 +48,9 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
-    def instantiate_model(cls, num_vars=1) -> GPT:
+    def instantiate_model(cls, args_index=1) -> GPT:
         args = None
-        if num_vars == 1:
+        if args_index == 1:
             args = cls.ARGS_1
 
         numVars             = args["numVars"]
@@ -89,8 +90,54 @@ class Pipeline:
         return model
 
     @classmethod
-    def train_model(cls, num_vars=5):
-        pass
+    def train_model(cls, args_index, model, train_dataset, val_dataset, device="cpu"):
+
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
+        data_dir        = args["data_dir"]
+        blockSize       = args["blockSize"]
+        numVars         = args["numVars"]
+        numYs           = args["numYs"]
+        numPoints       = args["numPoints"] 
+        target          = args["target"]
+        addVars         = True if args["variableEmbedding"] == 'STR_VAR' else False
+        const_range     = args["const_range"]
+        trainRange      = args["trainRange"]
+        decimals        = args["decimals"]
+
+        bestLoss = None # if there is any model to load as pre-trained one
+
+        # initialize a trainer instance and kick off training
+        tconf = TrainerConfig(
+                                max_epochs      = numEpochs, 
+                                batch_size      = batchSize, 
+                                learning_rate   = 6e-4,
+                                lr_decay        = True, 
+                                warmup_tokens   = 512*20, 
+                                final_tokens    = 2*len(train_dataset) * blockSize,
+                                num_workers     = 0,
+                                ckpt_path       = ckptPath,
+                            )
+
+        trainer = Trainer(model, train_dataset, val_dataset, tconf, bestLoss, device=device)
+
+        # # load the best model before training
+        # print('The following model {} has been loaded!'.format(ckptPath))
+        # model.load_state_dict(torch.load(ckptPath))
+        # model = model.eval().to(trainer.device)
+
+        try:
+            trainer.train()
+        except KeyboardInterrupt:
+            print('KeyboardInterrupt')
+
+        # load the best model
+        print('The following model {} has been loaded!'.format(ckptPath))
+        model.load_state_dict(torch.load(ckptPath))
+        
 
 
     @classmethod
@@ -143,7 +190,7 @@ class Pipeline:
         path = "{}/Train/*.json".format(data_dir)
         files = glob.glob(path)[:maxNumFiles]
         text = processDataFiles(files)
-        chars = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data
+        chars = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data       
         text = text.split('\n') # convert the raw text to a set of examples
         trainText = text[:-1] if len(text[-1]) == 0 else text
         
@@ -163,9 +210,49 @@ class Pipeline:
                                     augment     = False
                                     )
 
-        pdb.set_trace()
-
         return train_dataset
+    
+    @classmethod
+    def load_val_data(cls, args_index = 1):
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
+        data_dir        = args["data_dir"]
+        blockSize       = args["blockSize"]
+        numVars         = args["numVars"]
+        numYs           = args["numYs"]
+        numPoints       = args["numPoints"] 
+        target          = args["target"]
+        addVars         = True if args["variableEmbedding"] == 'STR_VAR' else False
+        const_range     = args["const_range"]
+        trainRange      = args["trainRange"]
+        decimals        = args["decimals"]
+        chars           = list(args["itos"].values())
+
+        path    = "{}/Val/*.json".format(data_dir)
+
+        files = glob.glob(path)
+        textVal = processDataFiles([files[0]])
+        textVal = textVal.split('\n') # convert the raw text to a set of examples
+
+        val_dataset = CharDataset(
+                                    textVal, 
+                                    blockSize, 
+                                    chars, 
+                                    numVars     = numVars, 
+                                    numYs       = numYs,
+                                    numPoints   = numPoints, 
+                                    target      = target, 
+                                    addVars     = addVars,
+                                    const_range = const_range, 
+                                    xRange      = trainRange, 
+                                    decimals    = decimals,
+                                )
+        
+        return val_dataset
+
                 
 
     @classmethod
