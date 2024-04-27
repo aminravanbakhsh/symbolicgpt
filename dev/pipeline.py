@@ -37,7 +37,17 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
-    def run_model(cls, model, data):
+    def eval_model(cls, model, dataset):
+
+        loader = torch.utils.data.DataLoader(
+                                dataset, 
+                                shuffle=False, 
+                                pin_memory=True,
+                                batch_size=1,
+                                num_workers=0)
+        
+        
+
         pass
 
     ################################################################################################
@@ -148,11 +158,12 @@ class Pipeline:
 
         model_dir_path  = args["model_dir_path"]
         model_path      = args["model_path"]
-
         path    = "{}/{}".format(model_dir_path, model_path)
-        model   = torch.load(path)
+        model   = torch.load(path, map_location=torch.device('cpu'))
+        model   = model.eval().to('cpu')
 
         return model
+
 
     ################################################################################################
     #                              #            Data               #                               #
@@ -162,47 +173,9 @@ class Pipeline:
 
     @classmethod
     def load_data(cls, args_index = 1):
+        pass
 
-        args = None
-        if args_index == 1:
-            args = cls.ARGS_1
 
-        numVars             = args["numVars"]
-        numYs               = args["numYs"]
-        numPoints           = args["numPoints"] 
-        embeddingSize       = args["embeddingSize"]
-        method              = args["method"]
-        variableEmbedding   = args["variableEmbedding"]
-        block_size          = args["blockSize"]
-        vocab_size          = args["vocab_size"]
-        paddingID           = args["paddingID"]
-
-        # # create the model
-        # pconf = PointNetConfig(
-        #                         embeddingSize        = embeddingSize, 
-        #                         numberofPoints       = numPoints[1]-1, 
-        #                         numberofVars         = numVars, 
-        #                         numberofYs           = numYs,
-        #                         method               = method,
-        #                         variableEmbedding    = variableEmbedding)
-
-        # mconf = GPTConfig(
-        #                     vocab_size, 
-        #                     block_size,
-        #                     n_layer         = 8, 
-        #                     n_head          = 8,   
-        #                     n_embd          = embeddingSize, 
-        #                     padding_idx     = paddingID
-        #                 )
-
-        # model = GPT(mconf, pconf)
-
-        # model = torch.load()
-
-        pdb.set_trace()
-
-        data = None
-        return data    
 
     @classmethod
     def load_train_data(cls, args_index = 1):
@@ -287,8 +260,15 @@ class Pipeline:
                                     xRange      = trainRange, 
                                     decimals    = decimals,
                                 )
-        
         return val_dataset
+    
+    @classmethod
+    def load_test_data(cls, args_index = 1):
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
 
                 
     @classmethod
