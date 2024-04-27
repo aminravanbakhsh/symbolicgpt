@@ -219,6 +219,8 @@ class Pipeline:
     @classmethod
     def load_val_data(cls, args_index = 1):
 
+        pdb.set_trace()
+
         args = None
         if args_index == 1:
             args = cls.ARGS_1

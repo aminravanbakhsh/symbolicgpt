@@ -11,9 +11,6 @@ def train_from_scratch(args_index = 1):
 
     pdb.set_trace()
 
-
-# train_from_scratch()
-
 pdb.set_trace()
 
 train_from_scratch()

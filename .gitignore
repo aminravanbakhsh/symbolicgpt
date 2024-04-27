@@ -16,3 +16,5 @@
 **/plots/*
 benchmarkSimilarEquations.json
 **/benchmark/*
+**/DimensionAnalysis.egg-info/*
+**/build/*

@@ -5,10 +5,33 @@ Summary: Utilizing Dimensional Analysis technique, which is commonly used in Phy
 Home-page: https://aminravanbakhsh.com/
 Author: Amin Ravanbakhsh
 Author-email: amin.ravanbakhsh@uwaterloo.ca
-License: UNKNOWN
-Platform: UNKNOWN
 Requires-Python: >=3.6
 License-File: LICENSE.txt
-
-UNKNOWN
-
+Requires-Dist: contourpy==1.2.0
+Requires-Dist: cycler==0.12.1
+Requires-Dist: DimensionAnalysis==0.1
+Requires-Dist: exceptiongroup==1.2.0
+Requires-Dist: filelock==3.13.1
+Requires-Dist: fonttools==4.49.0
+Requires-Dist: fsspec==2024.3.1
+Requires-Dist: iniconfig==2.0.0
+Requires-Dist: Jinja2==3.1.3
+Requires-Dist: kiwisolver==1.4.5
+Requires-Dist: MarkupSafe==2.1.5
+Requires-Dist: matplotlib==3.8.3
+Requires-Dist: mpmath==1.3.0
+Requires-Dist: networkx==3.2.1
+Requires-Dist: numpy==1.26.4
+Requires-Dist: packaging==24.0
+Requires-Dist: pillow==10.2.0
+Requires-Dist: pluggy==1.4.0
+Requires-Dist: pyparsing==3.1.2
+Requires-Dist: pytest==8.1.1
+Requires-Dist: python-dateutil==2.9.0.post0
+Requires-Dist: scipy==1.12.0
+Requires-Dist: six==1.16.0
+Requires-Dist: sympy==1.12
+Requires-Dist: tomli==2.0.1
+Requires-Dist: torch==2.2.1
+Requires-Dist: tqdm==4.66.2
+Requires-Dist: typing_extensions==4.10.0

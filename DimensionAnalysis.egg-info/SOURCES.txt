@@ -4,6 +4,7 @@ setup.py
 DimensionAnalysis.egg-info/PKG-INFO
 DimensionAnalysis.egg-info/SOURCES.txt
 DimensionAnalysis.egg-info/dependency_links.txt
+DimensionAnalysis.egg-info/requires.txt
 DimensionAnalysis.egg-info/top_level.txt
 baselines/__init__.py
 baselines/baseline_dsr.py
@@ -38,7 +39,10 @@ baselines/dsr/test/__init__.py
 baselines/dsr/test/generate_test_data.py
 baselines/dsr/test/test_core.py
 baselines/dsr/test/test_prior.py
-utils/__init__.py
-utils/dimension_analysis.py
-utils/formula.py
-utils/unit.py
+dev/__init__.py
+dev/controller.py
+dev/dimension_analyst.py
+dev/formula.py
+dev/pipeline.py
+dev/symbolic_utils.py
+dev/unit.py
