@@ -40,7 +40,6 @@ class Pipeline:
     def run_model(cls, model, data):
         pass
 
-
     ################################################################################################
     #                              #            Model              #                               #
     ################################################################################################
@@ -109,8 +108,6 @@ class Pipeline:
         bestLoss        = None # if there is any model to load as pre-trained one
         numEpochs       = 20 # number of epochs to train the GPT+PT model
         ckptPath        = "{}/{}".format(ckpt_path_dir, fName)
-
-        pdb.set_trace()
         
         # initialize a trainer instance and kick off training
         tconf = TrainerConfig(
@@ -140,25 +137,22 @@ class Pipeline:
         print('The following model {} has been loaded!'.format(ckptPath))
         model.load_state_dict(torch.load(ckptPath))
 
-        pdb.set_trace()
         return model
 
-
     @classmethod
-    def load_model(cls, num_vars = 5):
+    def load_model(cls, args_index = 1):
 
-        """
-            XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
-            XYE_2Var_200-201Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
-            XYE_3Var_500-501Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
-            XYE_5Var_10-200Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
-            XYE_9Var_20-250Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt
-        """
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
 
-        params = {}
-        model = None
+        model_dir_path  = args["model_dir_path"]
+        model_path      = args["model_path"]
 
-        return model, params
+        path    = "{}/{}".format(model_dir_path, model_path)
+        model   = torch.load(path)
+
+        return model
 
     ################################################################################################
     #                              #            Data               #                               #
@@ -167,7 +161,46 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
-    def load_data(cls, path):
+    def load_data(cls, args_index = 1):
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
+        numVars             = args["numVars"]
+        numYs               = args["numYs"]
+        numPoints           = args["numPoints"] 
+        embeddingSize       = args["embeddingSize"]
+        method              = args["method"]
+        variableEmbedding   = args["variableEmbedding"]
+        block_size          = args["blockSize"]
+        vocab_size          = args["vocab_size"]
+        paddingID           = args["paddingID"]
+
+        # # create the model
+        # pconf = PointNetConfig(
+        #                         embeddingSize        = embeddingSize, 
+        #                         numberofPoints       = numPoints[1]-1, 
+        #                         numberofVars         = numVars, 
+        #                         numberofYs           = numYs,
+        #                         method               = method,
+        #                         variableEmbedding    = variableEmbedding)
+
+        # mconf = GPTConfig(
+        #                     vocab_size, 
+        #                     block_size,
+        #                     n_layer         = 8, 
+        #                     n_head          = 8,   
+        #                     n_embd          = embeddingSize, 
+        #                     padding_idx     = paddingID
+        #                 )
+
+        # model = GPT(mconf, pconf)
+
+        # model = torch.load()
+
+        pdb.set_trace()
+
         data = None
         return data    
 
@@ -218,8 +251,6 @@ class Pipeline:
     
     @classmethod
     def load_val_data(cls, args_index = 1):
-
-        pdb.set_trace()
 
         args = None
         if args_index == 1:
@@ -289,8 +320,8 @@ class Pipeline:
     ################################################################################################
 
     ARGS_1 = {
-            "data_dir"              : "/home/amin/vscodes/symbolicgpt/untracked_folder/datasets/1Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_30Points",
-            "model_dir_path"        : "/home/amin/vscodes/symbolicgpt/untracked_folder/models",
+            "data_dir"              : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Datasets/1Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_30Points",
+            "model_dir_path"        : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Models",
             "model_path"            : "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
             "fName"                 : "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
             "ckpt_path_dir"         : "/home/amin/vscodes/symbolicgpt/untracked_folder/trained_models/var_1",
