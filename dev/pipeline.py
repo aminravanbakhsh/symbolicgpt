@@ -37,18 +37,117 @@ class Pipeline:
     ################################################################################################
 
     @classmethod
-    def eval_model(cls, model, dataset):
+    def eval_model(cls, dataset, args_index = 1):
 
-        loader = torch.utils.data.DataLoader(
-                                dataset, 
-                                shuffle=False, 
-                                pin_memory=True,
-                                batch_size=1,
-                                num_workers=0)
+        ## Test the model
+        # alright, let's sample some character-level symbolic GPT 
+
+        args = None
+        if args_index == 1:
+            args = cls.ARGS_1
+
+        data_dir            = args["data_dir"]
+        blockSize           = args["blockSize"]
+        numVars             = args["numVars"]
+        numYs               = args["numYs"]
+        numPoints           = args["numPoints"] 
+        target              = args["target"]
+        addVars             = True if args["variableEmbedding"] == 'STR_VAR' else False
+        const_range         = args["const_range"]
+        trainRange          = args["trainRange"]
+        decimals            = args["decimals"]
+        batchSize           = args["batchSize"]
+        ckpt_path_dir       = args["ckpt_path_dir"]
+        fName               = args["fName"]
+        itos                = args["itos"]
+        variableEmbedding   = args["variableEmbedding"]
+        paddingToken        = args["paddingToken"]
+
+
+        model = cls.load_model()
         
+        loader = torch.utils.data.DataLoader(
+                                                dataset, 
+                                                shuffle         = False, 
+                                                pin_memory      = True,
+                                                batch_size      = 1,
+                                                num_workers     = 0
+                                            )
+
+        resultDict = {}
+        try:
+            for i, batch in enumerate(loader):
+
+                inputs, outputs, points, variables = batch
+
+                inputs      = inputs[:,0:1].to("cpu")
+                points      = points.to("cpu")
+                variables   = variables.to("cpu")
+
+                outputsHat  = sample_from_model(
+                                model, 
+                                inputs, 
+                                blockSize, 
+                                points          = points,
+                                variables       = variables,
+                                temperature     = 1.0, 
+                                sample          = True, 
+                                top_k           = 0.0,
+                                top_p           = 0.7)[0]
+
+            # filter out predicted
+            target      = ''.join([itos.itos[int(i)] for i in outputs[0]])
+            predicted   = ''.join([itos.itos[int(i)] for i in outputsHat])
+
+            if variableEmbedding == 'STR_VAR':
+                target = target.split(':')[-1]
+                predicted = predicted.split(':')[-1]
+
+            target      = target.strip(paddingToken).split('>')
+            target      = target[0] #if len(target[0])>=1 else target[1]
+            target      = target.strip('<').strip(">")
+            predicted   = predicted.strip(paddingToken).split('>')
+            predicted   = predicted[0] #if len(predicted[0])>=1 else predicted[1]
+            predicted   = predicted.strip('<').strip(">")
+            
+            print('Target:{}\nSkeleton:{}'.format(target, predicted))
+            
+        except KeyboardInterrupt:
+            print('KeyboardInterrupt')
 
 
-        pass
+        resultDict = {}
+        try:
+            with open(fName, 'w', encoding="utf-8") as o:
+                resultDict[fName] = {'SymbolicGPT':[]}
+
+                for i, batch in enumerate(loader):
+                        
+                    inputs,outputs,points,variables = batch
+
+                    print('Test Case {}.'.format(i))
+                    o.write('Test Case {}/{}.\n'.format(i,len(textTest)-1))
+
+                    t = json.loads(textTest[i])
+
+                    inputs = inputs[:,0:1].to(trainer.device)
+                    points = points.to(trainer.device)
+                    variables = variables.to(trainer.device)
+                    outputsHat = sample_from_model(
+                                model, 
+                                inputs, 
+                                blockSize, 
+                                points=points,
+                                variables=variables,
+                                temperature=1.0, 
+                                sample=True, 
+                                top_k=0.0,
+                                top_p=0.7)[0]
+                    
+            
+        except KeyboardInterrupt:
+            print('KeyboardInterrupt')
+
 
     ################################################################################################
     #                              #            Model              #                               #
@@ -360,6 +459,7 @@ class Pipeline:
             "vocab_size"            : 49,
             "paddingID"             : 34,
             "size"                  : 498795,
+            "paddingToken"          : '_',
             "itos"                  : {   
                                         0: '\n',
                                         1: ' ', 
