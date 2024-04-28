@@ -86,14 +86,15 @@ def top_k_top_p_filtering(logits, top_k=0.0, top_p=0.0, filter_value=-float('Inf
     return logits
 
 @torch.no_grad()
-def sample_from_model(model, x, steps, points=None, variables=None, temperature=1.0, sample=False, top_k=0.0, top_p=0.0):
+def sample_from_model(model, x, steps, points=None, variables=None, temperature=1.0, sample=False, top_k=0.0, top_p=0.0, params=None):
     """
     take a conditioning sequence of indices in x (of shape (b,t)) and predict the next token in
     the sequence, feeding the predictions back into the model each time. Clearly the sampling
     has quadratic complexity unlike an RNN that is only linear, and has a finite context window
     of block_size, unlike an RNN that has an infinite context window.
     """
-    block_size = model.get_block_size()
+    # block_size = model.get_block_size()
+    block_size = params["blockSize"]
     model.eval()
     for k in range(steps):
         x_cond = x if x.size(1) <= block_size else x[:, -block_size:] # crop context if needed

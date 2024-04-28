@@ -63,9 +63,10 @@ class Pipeline:
         variableEmbedding   = args["variableEmbedding"]
         paddingToken        = args["paddingToken"]
 
+        model = cls.load_model(args_index)
 
-        model = cls.load_model()
-        
+        pdb.set_trace()
+
         loader = torch.utils.data.DataLoader(
                                                 dataset, 
                                                 shuffle         = False, 
@@ -74,7 +75,9 @@ class Pipeline:
                                                 num_workers     = 0
                                             )
 
-        resultDict = {}
+        # resultDict = {}
+
+        pdb.set_trace()
         try:
             for i, batch in enumerate(loader):
 
@@ -93,7 +96,9 @@ class Pipeline:
                                 temperature     = 1.0, 
                                 sample          = True, 
                                 top_k           = 0.0,
-                                top_p           = 0.7)[0]
+                                top_p           = 0.7,
+                                params          = args
+                                )[0]
 
             # filter out predicted
             target      = ''.join([itos.itos[int(i)] for i in outputs[0]])
@@ -111,39 +116,6 @@ class Pipeline:
             predicted   = predicted.strip('<').strip(">")
             
             print('Target:{}\nSkeleton:{}'.format(target, predicted))
-            
-        except KeyboardInterrupt:
-            print('KeyboardInterrupt')
-
-
-        resultDict = {}
-        try:
-            with open(fName, 'w', encoding="utf-8") as o:
-                resultDict[fName] = {'SymbolicGPT':[]}
-
-                for i, batch in enumerate(loader):
-                        
-                    inputs,outputs,points,variables = batch
-
-                    print('Test Case {}.'.format(i))
-                    o.write('Test Case {}/{}.\n'.format(i,len(textTest)-1))
-
-                    t = json.loads(textTest[i])
-
-                    inputs = inputs[:,0:1].to(trainer.device)
-                    points = points.to(trainer.device)
-                    variables = variables.to(trainer.device)
-                    outputsHat = sample_from_model(
-                                model, 
-                                inputs, 
-                                blockSize, 
-                                points=points,
-                                variables=variables,
-                                temperature=1.0, 
-                                sample=True, 
-                                top_k=0.0,
-                                top_p=0.7)[0]
-                    
             
         except KeyboardInterrupt:
             print('KeyboardInterrupt')
@@ -257,9 +229,19 @@ class Pipeline:
 
         model_dir_path  = args["model_dir_path"]
         model_path      = args["model_path"]
+
         path    = "{}/{}".format(model_dir_path, model_path)
-        model   = torch.load(path, map_location=torch.device('cpu'))
-        
+        # model   = torch.load(path, map_location=torch.device('cpu'))
+
+        model   = cls.instantiate_model(args_index)
+        # model.load_state_dict(torch.load(path))
+        # model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+
+        model.load_state_dict(torch.load(path))
+        model = model.eval().to("cpu")
+
+
         return model
 
 
@@ -272,7 +254,6 @@ class Pipeline:
     @classmethod
     def load_data(cls, args_index = 1):
         pass
-
 
 
     @classmethod

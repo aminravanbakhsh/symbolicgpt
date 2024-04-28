@@ -9,11 +9,12 @@ Requires-Python: >=3.6
 License-File: LICENSE.txt
 Requires-Dist: contourpy==1.2.0
 Requires-Dist: cycler==0.12.1
-Requires-Dist: DimensionAnalysis==0.1
+Requires-Dist: DimensionAnalysis@ file:///Users/aminravanbakhsh/vscode/symbolicgpt
 Requires-Dist: exceptiongroup==1.2.0
 Requires-Dist: filelock==3.13.1
 Requires-Dist: fonttools==4.49.0
 Requires-Dist: fsspec==2024.3.1
+Requires-Dist: importlib_resources==6.4.0
 Requires-Dist: iniconfig==2.0.0
 Requires-Dist: Jinja2==3.1.3
 Requires-Dist: kiwisolver==1.4.5
@@ -32,6 +33,9 @@ Requires-Dist: scipy==1.12.0
 Requires-Dist: six==1.16.0
 Requires-Dist: sympy==1.12
 Requires-Dist: tomli==2.0.1
-Requires-Dist: torch==2.2.1
+Requires-Dist: torch==2.3.0
+Requires-Dist: torchaudio==2.3.0
+Requires-Dist: torchvision==0.18.0
 Requires-Dist: tqdm==4.66.2
 Requires-Dist: typing_extensions==4.10.0
+Requires-Dist: zipp==3.18.1
