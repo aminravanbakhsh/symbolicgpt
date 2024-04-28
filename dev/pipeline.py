@@ -46,7 +46,7 @@ class Pipeline:
                                 batch_size=1,
                                 num_workers=0)
         
-        
+
 
         pass
 
@@ -160,8 +160,7 @@ class Pipeline:
         model_path      = args["model_path"]
         path    = "{}/{}".format(model_dir_path, model_path)
         model   = torch.load(path, map_location=torch.device('cpu'))
-        model   = model.eval().to('cpu')
-
+        
         return model
 
 
@@ -269,7 +268,40 @@ class Pipeline:
         if args_index == 1:
             args = cls.ARGS_1
 
+        data_dir        = args["data_dir"]
+        blockSize       = args["blockSize"]
+        numVars         = args["numVars"]
+        numYs           = args["numYs"]
+        numPoints       = args["numPoints"] 
+        target          = args["target"]
+        addVars         = True if args["variableEmbedding"] == 'STR_VAR' else False
+        const_range     = args["const_range"]
+        trainRange      = args["trainRange"]
+        decimals        = args["decimals"]
+        chars           = list(args["itos"].values())
 
+        path            = "{}/Test/*.json".format(data_dir)
+
+        files           = glob.glob(path)
+        textTest        = processDataFiles([files[0]])
+        textTest        = textTest.split('\n') # convert the raw text to a set of examples
+
+        test_dataset    = CharDataset(
+                                    textTest, 
+                                    blockSize, 
+                                    chars, 
+                                    numVars     = numVars, 
+                                    numYs       = numYs,
+                                    numPoints   = numPoints, 
+                                    target      = target, 
+                                    addVars     = addVars,
+                                    const_range = const_range, 
+                                    xRange      = trainRange, 
+                                    decimals    = decimals,
+                                )
+        
+        return test_dataset
+        
                 
     @classmethod
     def sample_from_data(cls, 
