@@ -235,12 +235,11 @@ class Pipeline:
 
         model   = cls.instantiate_model(args_index)
         # model.load_state_dict(torch.load(path))
-        # model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
 
-
-        model.load_state_dict(torch.load(path))
-        model = model.eval().to("cpu")
-
+        pdb.set_trace()
+        
+        model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        # model = model.eval().to("cpu")
 
         return model
 
@@ -273,15 +272,14 @@ class Pipeline:
         const_range     = args["const_range"]
         trainRange      = args["trainRange"]
         decimals        = args["decimals"]
+        maxNumFiles     = 10
 
-        maxNumFiles = 10
-
-        path = "{}/Train/*.json".format(data_dir)
-        files = glob.glob(path)[:maxNumFiles]
-        text = processDataFiles(files)
-        chars = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data       
-        text = text.split('\n') # convert the raw text to a set of examples
-        trainText = text[:-1] if len(text[-1]) == 0 else text
+        path            = "{}/Train/*.json".format(data_dir)
+        files           = glob.glob(path)[:maxNumFiles]
+        text            = processDataFiles(files)
+        chars           = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data       
+        text            = text.split('\n') # convert the raw text to a set of examples
+        trainText       = text[:-1] if len(text[-1]) == 0 else text
         
         random.shuffle(trainText) # shuffle the dataset, it's important specailly for the combined number of variables experiment
         
