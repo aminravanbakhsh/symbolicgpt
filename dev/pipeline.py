@@ -40,25 +40,16 @@ class Pipeline:
     def eval_model(cls, dataset, args_index = 1):
 
         ## Test the model
-        # alright, let's sample some character-level symbolic GPT 
+        # alright, let's sample some character-level symbolic GPT
+
+         
 
         args = None
         if args_index == 1:
             args = cls.ARGS_1
 
-        data_dir            = args["data_dir"]
         blockSize           = args["blockSize"]
-        numVars             = args["numVars"]
-        numYs               = args["numYs"]
-        numPoints           = args["numPoints"] 
         target              = args["target"]
-        addVars             = True if args["variableEmbedding"] == 'STR_VAR' else False
-        const_range         = args["const_range"]
-        trainRange          = args["trainRange"]
-        decimals            = args["decimals"]
-        batchSize           = args["batchSize"]
-        ckpt_path_dir       = args["ckpt_path_dir"]
-        fName               = args["fName"]
         itos                = args["itos"]
         variableEmbedding   = args["variableEmbedding"]
         paddingToken        = args["paddingToken"]
@@ -237,9 +228,22 @@ class Pipeline:
         # model.load_state_dict(torch.load(path))
 
         pdb.set_trace()
+
+
+        # Check if MPS is available and set the device accordingly
+        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+        print(f"Using device: {device}")
+
+        # Load the model state dictionary with dynamic device mapping
+        model_state = torch.load(path, map_location=device)
         
-        model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+        # model.load_state_dict(torch.load(path, map_location=torch.device('mps')))
+        # model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
         # model = model.eval().to("cpu")
+
+        # Assuming 'model' is already defined and is the correct architecture
+        model.load_state_dict(model_state)
+        model.to(device)
 
         return model
 
@@ -420,7 +424,7 @@ class Pipeline:
             "numPoints"             : [30,31], # number of points that we are going to receive to make a prediction about f given x and y, if you don't know then use the maximum
             "numVars"               : 1, # the dimenstion of input points x, if you don't know then use the maximum
             "numYs"                 : 1, # the dimension of output points y = f(x), if you don't know then use the maximum
-            "blockSize"             : 200, # spatial extent of the model for its context
+            "blockSize"             : 64, # spatial extent of the model for its context
             "testBlockSize"         : 400,
             "batchSize"             : 128, # batch size of training data
             "target"                : 'Skeleton', #'Skeleton' #'EQ'

@@ -115,6 +115,7 @@ class PointNetConfig:
             setattr(self, k, v)
 
 class PointNet(nn.Module):
+    
     """
     :param x: a tensor of (x,y)s, it should be [batch_size, maximum_number_of_points, maximum_num_of_variables+numberofoutputs]
 
@@ -139,6 +140,7 @@ class PointNet(nn.Module):
         and
         y = g( max((h(x1, y1), ...., h(xn, yn)) )
     """
+
     def __init__(self, config):
         super().__init__()
 

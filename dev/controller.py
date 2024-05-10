@@ -15,7 +15,6 @@ def train_from_scratch(args_index = 1):
 def test_001(arg_index = 1):
 
     model           = Pipeline.load_model()
-
     test_data       = Pipeline.load_test_data()
     
     Pipeline.eval_model(test_data)

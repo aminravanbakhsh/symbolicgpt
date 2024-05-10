@@ -18,3 +18,4 @@ benchmarkSimilarEquations.json
 **/benchmark/*
 **/DimensionAnalysis.egg-info/*
 **/build/*
+**/board_game/*
