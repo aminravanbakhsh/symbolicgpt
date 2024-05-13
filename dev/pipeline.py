@@ -42,8 +42,6 @@ class Pipeline:
         ## Test the model
         # alright, let's sample some character-level symbolic GPT
 
-         
-
         args = None
         if args_index == 1:
             args = cls.ARGS_1
@@ -68,15 +66,17 @@ class Pipeline:
 
         # resultDict = {}
 
+        device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
         pdb.set_trace()
         try:
             for i, batch in enumerate(loader):
 
                 inputs, outputs, points, variables = batch
 
-                inputs      = inputs[:,0:1].to("cpu")
-                points      = points.to("cpu")
-                variables   = variables.to("cpu")
+                inputs      = inputs[:,0:1].to(device)
+                points      = points.to(device)
+                variables   = variables.to(device)
 
                 outputsHat  = sample_from_model(
                                 model, 
@@ -90,23 +90,45 @@ class Pipeline:
                                 top_p           = 0.7,
                                 params          = args
                                 )[0]
+                
+                pdb.set_trace()
 
-            # filter out predicted
-            target      = ''.join([itos.itos[int(i)] for i in outputs[0]])
-            predicted   = ''.join([itos.itos[int(i)] for i in outputsHat])
+                # filter out predicted
+                target      = ''.join([itos[int(i)] for i in outputs[0]])
+                predicted   = ''.join([itos[int(i)] for i in outputsHat])
 
-            if variableEmbedding == 'STR_VAR':
-                target = target.split(':')[-1]
-                predicted = predicted.split(':')[-1]
+                if variableEmbedding == 'STR_VAR':
+                    target = target.split(':')[-1]
+                    predicted = predicted.split(':')[-1]
 
-            target      = target.strip(paddingToken).split('>')
-            target      = target[0] #if len(target[0])>=1 else target[1]
-            target      = target.strip('<').strip(">")
-            predicted   = predicted.strip(paddingToken).split('>')
-            predicted   = predicted[0] #if len(predicted[0])>=1 else predicted[1]
-            predicted   = predicted.strip('<').strip(">")
+                target      = target.strip(paddingToken).split('>')
+                target      = target[0] #if len(target[0])>=1 else target[1]
+                target      = target.strip('<').strip(">")
+                predicted   = predicted.strip(paddingToken).split('>')
+                predicted   = predicted[0] #if len(predicted[0])>=1 else predicted[1]
+                predicted   = predicted.strip('<').strip(">")
+
+                pdb.set_trace()
             
-            print('Target:{}\nSkeleton:{}'.format(target, predicted))
+                print('Target:    {}\nSkeleton:  {}'.format(target, predicted))
+
+
+            # train a regressor to find the constants (too slow)
+            c = [1.0 for i,x in enumerate(predicted) if x=='C'] # initialize coefficients as 1
+            # c[-1] = 0 # initialize the constant as zero
+            b = [(-2,2) for i,x in enumerate(predicted) if x=='C']  # bounds on variables
+            try:
+                if len(c) != 0:
+                    # This is the bottleneck in our algorithm
+                    # for easier comparison, we are using minimize package  
+                    cHat = minimize(lossFunc, c, #bounds=b,
+                                   args=(predicted, t['X'], t['Y'])) 
+        
+                    predicted = predicted.replace('C','{}').format(*cHat.x)
+            except ValueError:
+                raise 'Err: Wrong Equation {}'.format(predicted)
+            except Exception as e:
+                raise 'Err: Wrong Equation {}, Err: {}'.format(predicted, e)
             
         except KeyboardInterrupt:
             print('KeyboardInterrupt')
@@ -220,28 +242,10 @@ class Pipeline:
 
         model_dir_path  = args["model_dir_path"]
         model_path      = args["model_path"]
-
         path    = "{}/{}".format(model_dir_path, model_path)
-        # model   = torch.load(path, map_location=torch.device('cpu'))
-
         model   = cls.instantiate_model(args_index)
-        # model.load_state_dict(torch.load(path))
-
-        pdb.set_trace()
-
-
-        # Check if MPS is available and set the device accordingly
         device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-        print(f"Using device: {device}")
-
-        # Load the model state dictionary with dynamic device mapping
         model_state = torch.load(path, map_location=device)
-        
-        # model.load_state_dict(torch.load(path, map_location=torch.device('mps')))
-        # model.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-        # model = model.eval().to("cpu")
-
-        # Assuming 'model' is already defined and is the correct architecture
         model.load_state_dict(model_state)
         model.to(device)
 

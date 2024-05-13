@@ -212,11 +212,11 @@ model = model.eval().to(trainer.device)
 ## Test the model
 # alright, let's sample some character-level symbolic GPT 
 loader = torch.utils.data.DataLoader(
-                                test_dataset, 
-                                shuffle=False, 
-                                pin_memory=True,
-                                batch_size=1,
-                                num_workers=0)
+                                    test_dataset, 
+                                    shuffle=False, 
+                                    pin_memory=True,
+                                    batch_size=1,
+                                    num_workers=0)
 
 from utils import *
 resultDict = {}
@@ -272,6 +272,7 @@ try:
             c = [1.0 for i,x in enumerate(predicted) if x=='C'] # initialize coefficients as 1
             # c[-1] = 0 # initialize the constant as zero
             b = [(-2,2) for i,x in enumerate(predicted) if x=='C']  # bounds on variables
+
             try:
                 if len(c) != 0:
                     # This is the bottleneck in our algorithm
