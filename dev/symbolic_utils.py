@@ -1,12 +1,9 @@
 # imports
 
 
-
-
 class Symbolic_Utils:
 
     """
-
         operations on formula
 
             binary:
@@ -25,6 +22,7 @@ class Symbolic_Utils:
 
                 5) exp
                 6) log
+                7;;k
 
                 7) cosh
                 8) sinh
@@ -46,10 +44,6 @@ class Symbolic_Utils:
                 3) multi summation
                 4) mutli multiplication
                 
-                
-            
-                
-
     """
 
 
