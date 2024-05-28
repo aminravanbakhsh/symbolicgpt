@@ -38,18 +38,37 @@ class TrainerConfig:
 
 class Trainer:
 
-    def __init__(self, model, train_dataset, test_dataset, config, best=None, device='gpu'):
+    def __init__(self, model, train_dataset, test_dataset, config, best=None, device='mps'):
         self.model = model
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
         self.config = config
 
-        # take over whatever gpus are on the system
-        self.device = 'cpu'
-        if device == 'gpu' and torch.cuda.is_available():
-            self.device = torch.cuda.current_device()
+        # # take over whatever gpus are on the system
+        # self.device = 'cpu'
+        # if device == 'gpu' and torch.cuda.is_available():
+        #     self.device = torch.cuda.current_device()
+        #     self.model = torch.nn.DataParallel(self.model).to(self.device)
+        #     print('We are using the gpu now! device={}'.format(self.device))
+
+        # Check for CUDA (NVIDIA GPU)
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda')
             self.model = torch.nn.DataParallel(self.model).to(self.device)
-            print('We are using the gpu now! device={}'.format(self.device))
+            print('We are using the GPU now! device={}'.format(self.device))
+
+        # Check for MPS (Apple GPU)
+        elif torch.backends.mps.is_available():
+            self.device = torch.device('mps')
+            self.model = self.model.to(self.device)
+            print('We are using the Apple MPS now! device={}'.format(self.device))
+
+        # Default to CPU if no GPU is available
+        else:
+            self.device = torch.device('cpu')
+            self.model = self.model.to(self.device)
+            print('No GPU available, using CPU. device={}'.format(self.device))
+
 
         self.best_loss = best
 

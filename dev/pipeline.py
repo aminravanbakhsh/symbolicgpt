@@ -188,6 +188,8 @@ class Pipeline:
                 if type(err) is np.complex128:
                     err = abs(err.real)
 
+                return err
+
                 # resultDict[fName]['SymbolicGPT'].append(err)
             
         except KeyboardInterrupt:
@@ -248,7 +250,7 @@ class Pipeline:
         return model
 
     @classmethod
-    def train_model(cls, args_index, model, train_dataset, val_dataset, device="gpu"):
+    def train_model(cls, args_index, model, train_dataset, val_dataset, device="mps"):
 
         args = None
         if args_index == 1:
@@ -346,13 +348,9 @@ class Pipeline:
     #                              ####    ####    ####    ####    #                               # 
     ################################################################################################
 
-    @classmethod
-    def load_data(cls, args_index = 1):
-        pass
-
 
     @classmethod
-    def load_train_data(cls, args_index = 1):
+    def load_train_data(cls, args_index = 1, points_num = -1):
 
         args = None
         
@@ -386,10 +384,14 @@ class Pipeline:
         chars           = sorted(list(set(text))+['_','T','<','>',':']) # extract unique characters from the text before converting the text to a list, # T is for the test data       
         text            = text.split('\n') # convert the raw text to a set of examples
         trainText       = text[:-1] if len(text[-1]) == 0 else text
-        
+
         random.shuffle(trainText) # shuffle the dataset, it's important specailly for the combined number of variables experiment
         
-        train_dataset = CharDataset(text, 
+        
+        if not points_num == -1:
+            trainText = trainText[:points_num]
+        
+        train_dataset = CharDataset(trainText, 
                                     blockSize, 
                                     chars, 
                                     numVars     = numVars, 
@@ -402,11 +404,11 @@ class Pipeline:
                                     decimals    = decimals, 
                                     augment     = False
                                     )
-
+        
         return train_dataset
     
     @classmethod
-    def load_val_data(cls, args_index = 1):
+    def load_val_data(cls, args_index = 1, points_num = -1):
 
         args = None
 
@@ -420,7 +422,6 @@ class Pipeline:
             args = cls.ARGS_5
         elif args_index == 9:
             args = cls.ARGS_9
-
 
         data_dir        = args["data_dir"]
         blockSize       = args["blockSize"]
@@ -439,6 +440,9 @@ class Pipeline:
         files = glob.glob(path)
         textVal = processDataFiles([files[0]])
         textVal = textVal.split('\n') # convert the raw text to a set of examples
+        
+        if not points_num == -1:
+            textVal = textVal[:points_num]    
 
         val_dataset = CharDataset(
                                     textVal, 
@@ -456,7 +460,7 @@ class Pipeline:
         return val_dataset
     
     @classmethod
-    def load_test_data(cls, args_index = 1):
+    def load_test_data(cls, args_index = 1, points_num = -1):
 
         args = None
 
@@ -488,6 +492,9 @@ class Pipeline:
         files           = glob.glob(path)
         textTest        = processDataFiles([files[0]])
         textTest        = textTest.split('\n') # convert the raw text to a set of examples
+
+        if not points_num == -1:
+            textTest = textTest[:points_num]
 
         test_dataset    = CharDataset(
                                     textTest, 
@@ -537,7 +544,7 @@ class Pipeline:
             "model_dir_path"        : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Models",
             "model_path"            : "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
             "fName"                 : "XYE_1Var_30-31Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
-            "ckpt_path_dir"         : "/home/amin/vscodes/symbolicgpt/untracked_folder/trained_models/var_1",
+            "ckpt_path_dir"         : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/trained_models/var_1",
             
             "numEpochs"             : 20, # number of epochs to train the GPT+PT model
             "embeddingSize"         : 512, # the hidden dimension of the representation of both GPT and PT
@@ -619,7 +626,7 @@ class Pipeline:
         "model_dir_path"        : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Models",
         "model_path"            : "XYE_2Var_200-201Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
         "fName"                 : "XYE_2Var_200-201Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
-        "ckpt_path_dir"         : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/trained_models",
+        "ckpt_path_dir"         : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/trained_models/var_2",
         "numEpochs"             : 20,
         "embeddingSize"         : 512,
         "numPoints"             : [200,201],
@@ -634,21 +641,171 @@ class Pipeline:
         "trainRange"            : [-3.0,3.0],
         "dataDir"               : './datasets/',
         # "dataInfo"             ,
-        "titleTemplate"         : "{} equations of {} variables - Benchmark",
+        # "titleTemplate"         : "{} equations of {} variables - Benchmark",
         "dataFolder"            : "2Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_200Points",
         "addr"                  :'./SavedModels/',
         "method"                : 'EMB_SUM',
         "variableEmbedding"     : 'NOT_VAR',
-        
-        # "vocab_size"            : 49,
-        # "paddingID"             : 34,
-        # "size"                  : 498795,
-        # "paddingToken"          : '_',
-        # "itos"                  : {},
+        "vocab_size"            : 49,
+        "paddingID"             : 34,
+        "size"                  : 499035,
+        "paddingToken"          : '_',
+        "itos"                  : {
+                                    0: '\n', 
+                                    1: ' ', 
+                                    2: '"', 
+                                    3: '(', 
+                                    4: ')', 
+                                    5: '*', 
+                                    6: '+', 
+                                    7: ',', 
+                                    8: '-', 
+                                    9: '.', 
+                                    10: '/', 
+                                    11: '0', 
+                                    12: '1', 
+                                    13: '2', 
+                                    14: '3', 
+                                    15: '4', 
+                                    16: '5', 
+                                    17: '6', 
+                                    18: '7', 
+                                    19: '8', 
+                                    20: '9', 
+                                    21: ':',
+                                    22: ':', 
+                                    23: '<', 
+                                    24: '>', 
+                                    25: 'C', 
+                                    26: 'E', 
+                                    27: 'Q', 
+                                    28: 'S', 
+                                    29: 'T', 
+                                    30: 'X', 
+                                    31: 'Y', 
+                                    32: '[', 
+                                    33: ']', 
+                                    34: '_', 
+                                    35: 'c', 
+                                    36: 'e', 
+                                    37: 'g', 
+                                    38: 'i', 
+                                    39: 'k', 
+                                    40: 'l', 
+                                    41: 'n', 
+                                    42: 'o', 
+                                    43: 'p', 
+                                    44: 's', 
+                                    45: 't', 
+                                    46: 'x', 
+                                    47: '{', 
+                                    48: '}'
+                                }
         }
 
-    ARGS_3 = {}
+    ARGS_3 = {
+        "data_dir"              : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Datasets/3Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_500Points",
+        "model_dir_path"        : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/Models",
+        "model_path"            : "XYE_3Var_500-501Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
+        "fName"                 : "XYE_3Var_500-501Points_512EmbeddingSize_SymbolicGPT_GPT_PT_EMB_SUM_Skeleton_Padding_NOT_VAR_MINIMIZE.pt",
+        "ckpt_path_dir"         : "/Users/aminravanbakhsh/vscode/symbolicgpt/untracked_folder/trained_models/var_2",
+        "numEpochs" : 20, # number of epochs to train the GPT+PT model
+        "embeddingSize" : 512, # the hidden dimension of the representation of both GPT and PT
+        "numPoints":[500,501], # number of points that we are going to receive to make a prediction about f given x and y, if you don't know then use the maximum
+        "numVars":3, # the dimenstion of input points x, if you don't know then use the maximum
+        "numYs":1, # the dimension of output points y = f(x), if you don't know then use the maximum
+        "blockSize": 200, # spatial extent of the model for its context
+        "testBlockSize": 400,
+        "batchSize": 128, # batch size of training data
+        "target": 'Skeleton', #'Skeleton' #'EQ'
+        "const_range": [-2.1, 2.1], # constant range to generate during training only if target is Skeleton
+        "decimals": 8, # decimals of the points only if target is Skeleton
+        "trainRange": [-3.0,3.0], # support range to generate during training only if target is Skeleton  
+        "dataDir": './datasets/',
+        "dataFolder": '3Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_500Points',
+        "addr": './SavedModels/', # where to save model
+        "method": 'EMB_SUM', # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation.
+        "variableEmbedding": 'NOT_VAR',
+        "vocab_size"            : 49,
+        "paddingID"             : 34,
+        "size"                  : 192594,
+        "paddingToken"          : '_',
+        "itos"                  : {
+                                    0: '\n', 
+                                    1: ' ', 
+                                    2: '"', 
+                                    3: '(', 
+                                    4: ')', 
+                                    5: '*', 
+                                    6: '+', 
+                                    7: ',', 
+                                    8: '-', 
+                                    9: '.', 
+                                    10: '/', 
+                                    11: '0', 
+                                    12: '1', 
+                                    13: '2', 
+                                    14: '3', 
+                                    15: '4', 
+                                    16: '5', 
+                                    17: '6', 
+                                    18: '7', 
+                                    19: '8', 
+                                    20: '9', 
+                                    21: ':',
+                                    22: ':', 
+                                    23: '<', 
+                                    24: '>', 
+                                    25: 'C', 
+                                    26: 'E', 
+                                    27: 'Q', 
+                                    28: 'S', 
+                                    29: 'T', 
+                                    30: 'X', 
+                                    31: 'Y', 
+                                    32: '[', 
+                                    33: ']', 
+                                    34: '_', 
+                                    35: 'c', 
+                                    36: 'e', 
+                                    37: 'g', 
+                                    38: 'i', 
+                                    39: 'k', 
+                                    40: 'l', 
+                                    41: 'n', 
+                                    42: 'o', 
+                                    43: 'p', 
+                                    44: 's', 
+                                    45: 't', 
+                                    46: 'x', 
+                                    47: '{', 
+                                    48: '}'
+                                }
+        }
 
     ARGS_5 = {}
 
     ARGS_9 = {}
+
+"""
+numEpochs = 20 # number of epochs to train the GPT+PT model
+embeddingSize = 512 # the hidden dimension of the representation of both GPT and PT
+numPoints=[500,501] # number of points that we are going to receive to make a prediction about f given x and y, if you don't know then use the maximum
+numVars=3 # the dimenstion of input points x, if you don't know then use the maximum
+numYs=1 # the dimension of output points y = f(x), if you don't know then use the maximum
+blockSize = 200 # spatial extent of the model for its context
+testBlockSize = 400
+batchSize = 128 # batch size of training data
+target = 'Skeleton' #'Skeleton' #'EQ'
+const_range = [-2.1, 2.1] # constant range to generate during training only if target is Skeleton
+decimals = 8 # decimals of the points only if target is Skeleton
+trainRange = [-3.0,3.0] # support range to generate during training only if target is Skeleton
+dataDir = './datasets/'
+dataInfo = 'XYE_{}Var_{}Points_{}EmbeddingSize'.format(numVars, numPoints, embeddingSize)
+titleTemplate = "{} equations of {} variables - Benchmark"
+target = 'Skeleton' #'Skeleton' #'EQ'
+dataFolder = '3Var_RandSupport_FixedLength_-3to3_-5.0to-3.0-3.0to5.0_500Points'
+addr = './SavedModels/' # where to save model
+method = 'EMB_SUM' # EMB_CAT/EMB_SUM/OUT_SUM/OUT_CAT/EMB_CON -> whether to concat the embedding or use summation.
+variableEmbedding = 'NOT_VAR' # NOT_VAR/LEA_EMB/STR_VAR
+"""
